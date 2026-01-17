@@ -4,3 +4,15 @@ body {
     background-color: #02012C;
     color: white;
 }
+/*
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+@media (min-width: 768px) {
+    body {
+        gap: 64px;
+    }
+}*/

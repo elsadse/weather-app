@@ -1,5 +1,5 @@
-import Logo from "@/components/header/Logo";
-import UnitsSwitcher from "@/components/header/UnitSwitcher";
+import logo from "@/assets/images/logo.svg";
+import { UnitContainer } from "@/components/header/UnitContainer";
 
 function Header() {
   
@@ -12,8 +12,8 @@ function Header() {
             sm:mt-[24px] sm:px-[24px]
             md:mt-[48px] md:px-[112px]"
     >
-      <Logo />
-      <UnitsSwitcher />
+      <img src={logo} alt="Weather App Logo" className="h-[28px] sm:h-[40px] md:h-[40px]" />
+      <UnitContainer />
     </header>
   );
 }

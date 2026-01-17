@@ -1,9 +1,10 @@
 import { useState } from "react";
 import icon_units from "@/assets/images/icon-units.svg";
 import icon_dropdown from "@/assets/images/icon-dropdown.svg";
+import { UnitsDropdown } from "@/components/header/UnitsDropdown";
 
-function UnitsSwitcher() {
-  const [isOpen, setIsOpen] = useState(false);
+export function UnitContainer() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
     <div className="relative">
@@ -16,25 +17,29 @@ function UnitsSwitcher() {
           h-[33px] sm:h-[43px] md:h-[43px]
           rounded-lg 
           cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <img src={icon_units} alt="Units icon" />
         <span className="mx-[6px] sm:mx-[10px] md:mx-[10px]">Units</span>
         <img src={icon_dropdown} alt="Dropdown icon" />
       </button>
 
-      {isOpen && (
+      {isDropdownOpen && (
         <div
           className="
-            absolute bottom-0 
+            absolute right-0 
+            flex justify-center
+            z-10 md:z-auto
             mt-2 
+            h-[412px] w-[214px]
             rounded-xl 
             bg-[#262540]
           "
-        ></div>
+        >
+          <UnitsDropdown/>
+        </div>
       )}
     </div>
   );
 }
 
-export default UnitsSwitcher;
