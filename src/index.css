@@ -1,68 +1,120 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face {
+    font-family: "Bricolage Grotesque Bold";
+    src: url("./assets/fonts/Bricolage_Grotesque/static/BricolageGrotesque-Bold.ttf") format("truetype");
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+@font-face {
+    font-family: "DM Sans Light";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-Light.ttf") format("truetype");
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+@font-face {
+    font-family: "DM Sans Medium";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-Medium.ttf") format("truetype");
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+@font-face {
+    font-family: "DM Sans Semi Bold";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-SemiBold.ttf") format("truetype");
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+@font-face {
+    font-family: "DM Sans Semi Bold Italic";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-SemiBoldItalic.ttf") format("truetype");
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+@font-face {
+    font-family: "DM Sans Bold";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-Bold.ttf") format("truetype");
+}
+
+@theme {
+    --color-neutral-900: #02012C;
+    --color-neutral-800: #262540;
+    --color-neutral-700: #302F4A;
+    --color-neutral-600: #3C3B5E;
+    --color-neutral-300: #ACACB7;
+    --color-neutral-200: #D4D3D9;
+    --color-neutral-0: #FFFFFF;
+
+    --color-orange-500: #FF820A;
+
+    --color-blue-700: #2B1B9C;
+    --color-blue-500: #4658D9;
+
+    --font-bg-bold: "Bricolage Grotesque Bold";
+    --font-dm-light: "DM Sans Light";
+    --font-dm-medium: "DM Sans Medium";
+    --font-dm-semibold: "DM Sans Semi Bold";
+    --font-dm-semibold-italic: "DM Sans Semi Bold Italic";
+    --font-dm-bold: "DM Sans Bold";
+}
+
+@layer base {
+    :root {
+        font-family: var(--font-dm-light), serif;
+        color: var(--color-neutral-0);
+        background-color: var(--color-neutral-900);
+    }
+}
+
+@layer components {
+
+    .text-preset-1 {
+        font-family: var(--font-dm-semibold-italic), serif;
+        font-size: 96px;
+        line-height: 100%;
+        letter-spacing: -2px;
+    }
+
+    .text-preset-2 {
+        font-family: var(--font-bg-bold), serif;
+        font-size: 52px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-3 {
+        font-family: var(--font-dm-light), serif;
+        font-size: 32px;
+        line-height: 100%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-4 {
+        font-family: var(--font-dm-bold), serif;
+        font-size: 28px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-5 {
+        font-family: var(--font-dm-semibold), serif;
+        font-size: 20px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-6 {
+        font-family: var(--font-dm-medium), serif;
+        font-size: 18px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-7 {
+        font-family: var(--font-dm-medium), serif;
+        font-size: 16px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-8 {
+        font-family: var(--font-dm-medium), serif;
+        font-size: 14px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
 }
