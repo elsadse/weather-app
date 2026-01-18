@@ -1,46 +1,35 @@
-import "@/App.css";
-import Header from "@/components/header/Header";
-import { SearchBar } from "@/components/search/SearchBar";
-import { WeatherInfoContainer } from "@/components/WeatherInfoContainer/WeatherInfoContainer";
-import { DailyForecastContainer } from "@/components/dailyforecast/DailyForecastContainer";
-import { HourlyForecast } from "@/hourlyForecast/HourlyForecast";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 
-export function App() {
+function App() {
+  const [count, setCount] = useState(0)
+
   return (
-    <div className="app-container">
-      <Header />
-      <div
-        className="
-            flex justify-center items-center
-            mt-[48px] mb-[48px]
-            sm:mt-[48px] sm:mb-[48px]
-            md:mt-[64px] md:mb-[64px]"
-      >
-        <p className="text-center text-[62px]">How's the sky looking today?</p>
+    <>
+      <div>
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
       </div>
-
-      <main className="flex flex-col justify-center gap-[32px] sm:gap-[48px] md:gap-[48px] 
-            px-[16px]
-            sm:px-[24px]
-            md:px-[112px]
-            md:pb-[80px]
-            "
-      >
-        <SearchBar/>
-        <div className=" flex flex-row gap-[32px] ">
-          <div className=" flex flex-col gap-[48px] ">
-              <div className="">
-                <WeatherInfoContainer/>
-              </div>
-              <div className="">
-                <DailyForecastContainer/>
-              </div>
-          </div>
-          <div className="">
-            <HourlyForecast/>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </>
+  )
 }
+
+export default App
