@@ -1,3 +1,10 @@
+import { Header } from "@/components/header/Header";
+
 export function App() {
-  return <h1>Welcome weather-app</h1>;
+
+  return (
+    <>
+      <Header />
+    </>
+  );
 }

@@ -50,6 +50,38 @@
     --font-dm-semibold: "DM Sans Semi Bold";
     --font-dm-semibold-italic: "DM Sans Semi Bold Italic";
     --font-dm-bold: "DM Sans Bold";
+
+    --spacing-0: 0;
+    --spacing-025: 2px;
+    --spacing-050: 4px;
+    --spacing-075: 6px;
+    --spacing-100: 8px;
+    --spacing-125: 10px;
+    --spacing-150: 12px;
+    --spacing-200: 16px;
+    --spacing-250: 20px;
+    --spacing-300: 24px;
+    --spacing-400: 32px;
+    --spacing-500: 40px;
+    --spacing-600: 48px;
+    --spacing-800: 64px;
+    --spacing-1000: 80px;
+    --spacing-1200: 96px;
+    --spacing-1400: 112px;
+    --spacing-1600: 128px;
+    --spacing-1800: 140px;
+
+    --radius-0: 0;
+    --radius-4: 4px;
+    --radius-6: 6px;
+    --radius-8: 8px;
+    --radius-10: 10px;
+    --radius-12: 12px;
+    --radius-16: 16px;
+    --radius-20: 20px;
+    --radius-24: 24px;
+    --radius-full: 999px;
+
 }
 
 @layer base {
@@ -57,6 +89,14 @@
         font-family: var(--font-dm-light), serif;
         color: var(--color-neutral-0);
         background-color: var(--color-neutral-900);
+    }
+
+    body {
+        @apply min-w-[375px] min-h-screen m-0
+    }
+
+    #root {
+        @apply w-full h-full flex flex-col gap-y-12 lg:gap-y-16 px-4 md:px-6 lg:px-28 pt-4 md:pt-6 lg:pt-12 pb-12 md:pb-20
     }
 }
 
