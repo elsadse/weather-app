@@ -92,7 +92,7 @@
     }
 
     body {
-        @apply min-w-[375px] min-h-screen m-0
+        @apply min-w-[375px] min-h-screen m-0 max-w-[1216px]
     }
 
     #root {
