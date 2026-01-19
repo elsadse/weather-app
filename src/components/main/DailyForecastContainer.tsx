@@ -1,4 +1,5 @@
 import WeatherSunnyIcon from "@/assets/images/icon-sunny.webp"
+
 export function DailyForecastContainer() {
 
     return (
@@ -17,13 +18,10 @@ export function DailyForecastContainer() {
     )
 }
 
-type WeatherCardProps = {
-    day: string,
-}
-function WeatherCard({ day }: WeatherCardProps) {
+function WeatherCard({ day }: { day: string }) {
 
     return (
-        <div className="flex flex-col w-[103.66px] md:w-[89.14px] lg:w-[100.57px] h-[165px] items-center gap-y-4 px-2.5 py-4 bg-neutral-800 rounded-12">
+        <div className="h-41.25 flex flex-col gap-y-4 px-2.5 py-4 rounded-12 bg-neutral-800 border border-neutral-600 items-center">
             <span className="text-preset-6">{day}</span>
             <img className="h-15 w-15" src={WeatherSunnyIcon} alt="weather icon" />
             <div className="flex justify-between w-full">
