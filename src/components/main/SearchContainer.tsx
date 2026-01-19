@@ -1,16 +1,27 @@
 import IconSearch from "@/assets/images/icon-search.svg";
-import { useState } from "react";
+import type { LocationsResult } from "@/api/type";
+import { useCallback, useEffect, useState } from "react";
+import { fetchLocations } from "@/api/geocodingapi";
 
 export function SearchContainer() {
     const [searchTerm, setSearchTerm] = useState<string>("")
-    const [resultSSearch, setResultSSearch] = useState<string[]>([])
+    const [resultSSearch, setResultSSearch] = useState<LocationsResult[]>([])
 
-    function handleKeyDown() {
-        if (resultSSearch.length !== 0) {
-            setResultSSearch(["City Name 1", "City Name 1", "City Name 1"])
-        }
-        if (searchTerm.length !== 0) setResultSSearch(["City Name", "City Name", "City Name"])
-    }
+    useEffect(() => {
+        if (searchTerm.length < 2) setResultSSearch([])
+        fetchLocations(searchTerm).then(({ results, error }) => {
+            if (error) {
+                console.error(error)
+                return
+            }
+            setResultSSearch(results)
+        })
+    }, [searchTerm])
+
+    const handleResultClick = useCallback((result: LocationsResult) => {
+        setSearchTerm(result.city+" "+result.region+", "+result.country)
+        setResultSSearch([])
+    }, [])
 
     return (
         <form className="md:w-164 flex flex-col md:flex-row gap-y-3 md:gap-x-4 md:mx-auto">
@@ -24,10 +35,9 @@ export function SearchContainer() {
                     placeholder="Search for a place..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyDown={handleKeyDown}
                     className="w-full focus:outline-none placeholder:text-preset-5 color-neutral-200"
                 />
-                {resultSSearch.length !== 0 && searchTerm.length !== 0 && <SearchDropdown results={resultSSearch} />}
+                {resultSSearch.length !== 0 && searchTerm.length !== 0 && <SearchDropdown results={resultSSearch} onResultClick={handleResultClick} />}
             </div>
             <button type="submit" className="h-14 px-6 py-4 rounded-12 bg-blue-500 text-preset-5">Search</button>
         </form>
@@ -35,19 +45,27 @@ export function SearchContainer() {
 }
 
 type SearchDropdownProps = {
-    results: string[]
+    results: LocationsResult[],
+    onResultClick: (result: LocationsResult) => void;
 }
 
-function SearchDropdown({ results }: SearchDropdownProps) {
+function SearchDropdown({ results, onResultClick }: SearchDropdownProps) {
 
     return (
         <div
-            className="absolute left-0 top-16 w-85.75 md:w-147.5 xl:w-131.5 flex flex-col gap-x-1 p-2 bg-neutral-800 rounded-12">
+            className="max-h-64 overflow-y-auto absolute left-0 top-16 w-85.75 md:w-147.5 xl:w-131.5 flex flex-col gap-x-1 p-2 bg-neutral-800 rounded-12">
             {
-                results.map((result) => (
-                    <span className="px-2 py-2.5 rounded-8 hover:bg-neutral-700">{result}</span>
+                results.map((result, index) => (
+                    <div onClick={() => onResultClick(result)}
+                        key={index} className=" flex flex-col px-2 py-2.5 rounded-8 hover:bg-neutral-700 cursor-pointer">
+                        <span className="text-preset-6">{result.city}</span>
+                        <span className="text-preset-7 text-neutral-200">{result.region}, {result.country}</span>
+                    </div>
                 ))
             }
         </div>
     )
 }
+
+
+
