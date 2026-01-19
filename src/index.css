@@ -1,18 +1,160 @@
 @import "tailwindcss";
 
-body {
-    background-color: #02012C;
-    color: white;
-}
-/*
-.app-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
+@font-face {
+    font-family: "Bricolage Grotesque Bold";
+    src: url("./assets/fonts/Bricolage_Grotesque/static/BricolageGrotesque-Bold.ttf") format("truetype");
 }
 
-@media (min-width: 768px) {
-    body {
-        gap: 64px;
+@font-face {
+    font-family: "DM Sans Light";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-Light.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "DM Sans Medium";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-Medium.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "DM Sans Semi Bold";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "DM Sans Semi Bold Italic";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-SemiBoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "DM Sans Bold";
+    src: url("./assets/fonts/DM_Sans/static/DMSans-Bold.ttf") format("truetype");
+}
+
+@theme {
+    --color-neutral-900: #02012C;
+    --color-neutral-800: #262540;
+    --color-neutral-700: #302F4A;
+    --color-neutral-600: #3C3B5E;
+    --color-neutral-300: #ACACB7;
+    --color-neutral-200: #D4D3D9;
+    --color-neutral-0: #FFFFFF;
+
+    --color-orange-500: #FF820A;
+
+    --color-blue-700: #2B1B9C;
+    --color-blue-500: #4658D9;
+
+    --font-bg-bold: "Bricolage Grotesque Bold";
+    --font-dm-light: "DM Sans Light";
+    --font-dm-medium: "DM Sans Medium";
+    --font-dm-semibold: "DM Sans Semi Bold";
+    --font-dm-semibold-italic: "DM Sans Semi Bold Italic";
+    --font-dm-bold: "DM Sans Bold";
+
+    --spacing-0: 0;
+    --spacing-025: 2px;
+    --spacing-050: 4px;
+    --spacing-075: 6px;
+    --spacing-100: 8px;
+    --spacing-125: 10px;
+    --spacing-150: 12px;
+    --spacing-200: 16px;
+    --spacing-250: 20px;
+    --spacing-300: 24px;
+    --spacing-400: 32px;
+    --spacing-500: 40px;
+    --spacing-600: 48px;
+    --spacing-800: 64px;
+    --spacing-1000: 80px;
+    --spacing-1200: 96px;
+    --spacing-1400: 112px;
+    --spacing-1600: 128px;
+    --spacing-1800: 140px;
+
+    --radius-0: 0;
+    --radius-4: 4px;
+    --radius-6: 6px;
+    --radius-8: 8px;
+    --radius-10: 10px;
+    --radius-12: 12px;
+    --radius-16: 16px;
+    --radius-20: 20px;
+    --radius-24: 24px;
+    --radius-full: 999px;
+
+}
+
+@layer base {
+    :root {
+        font-family: var(--font-dm-light), serif;
+        color: var(--color-neutral-0);
+        background-color: var(--color-neutral-900);
     }
-}*/
+
+    body {
+        @apply min-w-[375px] min-h-screen m-0 max-w-[1216px]
+    }
+
+    #root {
+        @apply w-full h-full flex flex-col gap-y-12 lg:gap-y-16 px-4 md:px-6 lg:px-28 pt-4 md:pt-6 lg:pt-12 pb-12 md:pb-20
+    }
+}
+
+@layer components {
+
+    .text-preset-1 {
+        font-family: var(--font-dm-semibold-italic), serif;
+        font-size: 96px;
+        line-height: 100%;
+        letter-spacing: -2px;
+    }
+
+    .text-preset-2 {
+        font-family: var(--font-bg-bold), serif;
+        font-size: 52px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-3 {
+        font-family: var(--font-dm-light), serif;
+        font-size: 32px;
+        line-height: 100%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-4 {
+        font-family: var(--font-dm-bold), serif;
+        font-size: 28px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-5 {
+        font-family: var(--font-dm-semibold), serif;
+        font-size: 20px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-6 {
+        font-family: var(--font-dm-medium), serif;
+        font-size: 18px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-7 {
+        font-family: var(--font-dm-medium), serif;
+        font-size: 16px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+
+    .text-preset-8 {
+        font-family: var(--font-dm-medium), serif;
+        font-size: 14px;
+        line-height: 120%;
+        letter-spacing: 0;
+    }
+}
