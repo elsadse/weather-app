@@ -24,3 +24,4 @@ export async function getWeatherData({ latitude, longitude }: { latitude: number
     return { success: true, data: parsedWeatherData.data }
 }
 
+

@@ -1,32 +1,39 @@
-import WeatherIcon from "@/assets/images/icon-sunny.webp"
+import type { CurrentWeatherData, LocationInfo } from "@/api/types"
+import { getIcon } from "@/utils"
 
-export function WeatherInfoContainer() {
+export function WeatherInfoContainer({ infoWeatherData, locationInfo }: { infoWeatherData: CurrentWeatherData, locationInfo: LocationInfo }) {
 
     return (
         <div className="flex flex-col gap-y-5 xl:gap-y-8">
-            <WeatherInfo />
+            <WeatherInfo date={infoWeatherData.date} temperature={infoWeatherData.temperature} code={infoWeatherData.codeIcon} locationInfo={locationInfo} />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-x-5 xl:gap-x-6">
-                <WeatherDetail label="Feels Like" value={64} measure="°" />
-                <WeatherDetail label="Humidity" value={46} measure="%" />
-                <WeatherDetail label="Wind" value={9} measure=" mph" />
-                <WeatherDetail label="Precipitation" value={0} measure=" in" />
+                <WeatherDetail label="Feels Like" value={infoWeatherData.feels_like} measure="°" />
+                <WeatherDetail label="Humidity" value={infoWeatherData.humidity} measure="%" />
+                <WeatherDetail label="Wind" value={infoWeatherData.wind_speed} measure=" mph" />
+                <WeatherDetail label="Precipitation" value={infoWeatherData.precipitation} measure=" in" />
             </div>
         </div>
     )
 }
 
+type WeatherInfoProps = {
+    date: Date,
+    temperature: number,
+    code: number,
+    locationInfo: LocationInfo
+}
 
-function WeatherInfo() {
+function WeatherInfo({ date, temperature, code, locationInfo }: WeatherInfoProps) {
 
     return (
         <div className="flex flex-col justify-between items-center md:flex-row gap-y-4 md:gap-0 px-6 py-10 rounded-20 bg-today-small md:bg-today-large h-71.5">
             <div className=" flex flex-col gap-y-3">
-                <span className="text-preset-4">Berlin, Germany</span>
-                <span className="text-preset-6">Tuesday, Aug 5, 2025</span>
+                <span className="text-preset-4">{locationInfo.city + ", " + locationInfo.countryName}</span>
+                <span className="text-preset-6">{date.toLocaleDateString("en-Us", { weekday: "long", year: "numeric", month: "short", day: "numeric", })}</span>
             </div>
             <div className="flex flex-row gap-x-5 items-center">
-                <img src={WeatherIcon} alt="weather icon" className="h-30 w-30" />
-                <span className="text-preset-1">68°</span>
+                <img src={getIcon(code)} alt="weather icon" className="h-30 w-30" />
+                <span className="text-preset-1">{Math.round(temperature) + "°"}</span>
             </div>
         </div>
     )

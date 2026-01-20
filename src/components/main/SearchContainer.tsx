@@ -1,12 +1,14 @@
 import IconSearch from "@/assets/images/icon-search.svg";
-import type { MatchedLocation } from "@/api/types";
-import { useCallback, useEffect, useState } from "react";
+import type { Location, MatchedLocation } from "@/api/types";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { fetchLocations } from "@/api/geocodingapi";
+import { LocationContext } from "@/context/LocationContext";
 
 export function SearchContainer() {
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [resultSSearch, setResultSSearch] = useState<MatchedLocation[]>([])
-    const [selectedLocation, setSelectedLocation] = useState<{ longitude: number, latitude: number } | null>(null)
+    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
+    const locationContext = useContext(LocationContext)
 
     useEffect(() => {
         if (searchTerm.length < 2) return
@@ -23,6 +25,10 @@ export function SearchContainer() {
         searchLocation()
     }, [searchTerm])
 
+    useEffect(() => {
+        console.log("DEBUG - Location context:", locationContext?.location);
+    }, [locationContext?.location]);
+
     const handleResultClick = useCallback((result: MatchedLocation) => {
         setSearchTerm(result.city + " " + result.region + ", " + result.country)
         setResultSSearch([])
@@ -32,6 +38,7 @@ export function SearchContainer() {
     function handleSubmit(event: React.FormEvent) {
         event.preventDefault()
         if (selectedLocation) {
+            locationContext?.setLocation(selectedLocation)
             console.log(selectedLocation)
         }
     }

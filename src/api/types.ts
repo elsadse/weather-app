@@ -100,5 +100,21 @@ export const WeatherDataSchema = WeatherDataApiResponseSchema.transform((item) =
 
 export type WeatherData = z.infer<typeof WeatherDataSchema>
 
+export type CurrentWeatherData = z.infer<typeof CurrentWeatherDataSchema>
+
+export type DailyWeatherData = z.infer<typeof DailyWeatherDataSchema>
+
+export type HourlyWeatherData = z.infer<typeof HourlyWeatherDataSchema>
+
 export type Result<T> = { success: true, data: T } | { success: false, error: Error }
+
+export type Location = { latitude: number, longitude: number }
+
+export const LocationInfoApiResponseSchema = z.object({
+    city: z.string(),
+    countryName: z.string()
+}).describe("Schema for a single city response from the API")
+
+export type LocationInfo = z.infer<typeof LocationInfoApiResponseSchema>
+
 
