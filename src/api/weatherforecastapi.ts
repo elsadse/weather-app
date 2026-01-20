@@ -1,6 +1,6 @@
-import { WeatherDataSchema, type WeatherData } from "@/api/type"
+import { type Result, type WeatherData, WeatherDataApiResponseSchema, WeatherDataSchema } from "@/api/types"
 
-export async function getWeatherData({ latitude, longitude }: { latitude: number, longitude: number }): Promise<{ weatherData?: WeatherData, error?: string }> {
+export async function getWeatherData({ latitude, longitude }: { latitude: number, longitude: number }): Promise<Result<WeatherData>> {
     const params = new URLSearchParams({
         latitude: latitude.toString(),
         longitude: longitude.toString(),
@@ -11,40 +11,16 @@ export async function getWeatherData({ latitude, longitude }: { latitude: number
     })
     const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`)
     if (response.status !== 200) {
-        return { error: "Failed to get weather data." }
+        return { success: false, error: new Error("Failed to get weather data.") }
     }
-    const responseData = await response.json()
-    const formattedResponseData: WeatherData = {
-        latitude: responseData.latitude,
-        longitude: responseData.longitude,
-        currentWeatherData: {
-            day: responseData.current.time,
-            temperature: responseData.current.temperature_2m,
-            humidity: responseData.current.relative_humidity_2m,
-            temperatureFeel: responseData.current.apparent_temperature,
-            precipitation: responseData.current.precipitation,
-            iconCode: responseData.current.weather_code,
-            wind: responseData.current.wind_speed_10m
-        },
-        hourlyWeatherData: {
-            hours: responseData.hourly.time,
-            temperatures: responseData.hourly.temperature_2m,
-            iconCodes: responseData.hourly.weather_code
-        },
-        dailyWeatherData: {
-            days: responseData.daily.time,
-            temperaturesMax: responseData.daily.temperature_2m_max,
-            temperaturesMin: responseData.daily.temperature_2m_min,
-            iconCodes: responseData.daily.weather_code
-        }
+    const parsedWeatherDataApiResponse = WeatherDataApiResponseSchema.safeParse(await response.json())
+    if (!parsedWeatherDataApiResponse.success) {
+        return { success: false, error: parsedWeatherDataApiResponse.error }
     }
-    if (!formattedResponseData) {
-        return { error: "No weather results found." }
+    const parsedWeatherData = WeatherDataSchema.safeParse(parsedWeatherDataApiResponse.data)
+    if (!parsedWeatherData.success) {
+        return { success: false, error: parsedWeatherData.error }
     }
-    const parseFormattedResponseData = WeatherDataSchema.safeParse(formattedResponseData)
-    if (!parseFormattedResponseData.success) {
-        return { error: parseFormattedResponseData.error.message }
-    }
-    return { weatherData: formattedResponseData }
+    return { success: true, data: parsedWeatherData.data }
 }
-console.log(await getWeatherData({ latitude: 52.52, longitude: 13.41 }))
+

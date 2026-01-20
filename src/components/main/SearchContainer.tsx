@@ -1,25 +1,29 @@
 import IconSearch from "@/assets/images/icon-search.svg";
-import type { LocationsResult } from "@/api/type";
+import type { MatchedLocation } from "@/api/types";
 import { useCallback, useEffect, useState } from "react";
 import { fetchLocations } from "@/api/geocodingapi";
 
 export function SearchContainer() {
     const [searchTerm, setSearchTerm] = useState<string>("")
-    const [resultSSearch, setResultSSearch] = useState<LocationsResult[]>([])
+    const [resultSSearch, setResultSSearch] = useState<MatchedLocation[]>([])
     const [selectedLocation, setSelectedLocation] = useState<{ longitude: number, latitude: number } | null>(null)
 
     useEffect(() => {
         if (searchTerm.length < 2) return
-        fetchLocations(searchTerm).then(({ results, error }) => {
-            if (error) {
-                console.error(error)
+
+        async function searchLocation() {
+            const response = await fetchLocations(searchTerm)
+            if (!response.success) {
+                console.error(response.error)
                 return
             }
-            setResultSSearch(results)
-        })
+            setResultSSearch(response.data)
+        }
+
+        searchLocation()
     }, [searchTerm])
 
-    const handleResultClick = useCallback((result: LocationsResult) => {
+    const handleResultClick = useCallback((result: MatchedLocation) => {
         setSearchTerm(result.city + " " + result.region + ", " + result.country)
         setResultSSearch([])
         setSelectedLocation({ latitude: result.latitude, longitude: result.longitude })
@@ -54,8 +58,8 @@ export function SearchContainer() {
 }
 
 type SearchDropdownProps = {
-    results: LocationsResult[],
-    onResultClick: (result: LocationsResult) => void;
+    results: MatchedLocation[],
+    onResultClick: (result: MatchedLocation) => void;
 }
 
 function SearchDropdown({ results, onResultClick }: SearchDropdownProps) {

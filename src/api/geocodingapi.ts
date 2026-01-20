@@ -1,36 +1,27 @@
-import type { LocationsResult } from "@/api/type"
-import { LocationsResponseApiSchema, LocationsResultSchema } from "@/api/type"
+import { LocationsApiResponseSchema, MatchedLocationSchema, type MatchedLocation, type Result } from "@/api/types"
 
-export async function fetchLocations(searchQuery: string): Promise<{ results: LocationsResult[]; error?: string }> {
+export async function fetchLocations(searchQuery: string): Promise<Result<MatchedLocation[]>> {
     const params = new URLSearchParams({
         name: searchQuery,
         count: "20",
         language: "en",
         format: "json"
     })
-    try {
-        const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${params}`)
-        if (response.status !== 200) {
-            return {
-                results: [],
-                error: "Failed to fetch geocoding data."
-            };
-        }
-        const searchData = await response.json()
-        if (!searchData.results) {
-            return { results: [], error: "No geocoding results found." }
-        }
-        const parseResult = LocationsResponseApiSchema.safeParse(searchData.results)
-        if (!parseResult.success) {
-            return { results: [], error: parseResult.error.message }
-        }
-        const formattedSearchResults: LocationsResult[] = parseResult.data.map((item): LocationsResult => LocationsResultSchema.parse(item))
-        return { results: formattedSearchResults }
-    } catch (err) {
-        console.error("Error while searching for location")
-        return {
-            results: [],
-            error: "Unknown error during search"
-        }
+    const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${params}`)
+    if (response.status !== 200) {
+        return { success: false, error: new Error("Failed to fetch geocoding data.") }
     }
+    const apiResponseData = await response.json()
+    if (!apiResponseData.results) {
+        return { success: false, error: new Error("No geocoding results found.") }
+    }
+    const parsedApiResponseData = LocationsApiResponseSchema.safeParse(apiResponseData.results)
+    if (!parsedApiResponseData.success) {
+        return { success: false, error: parsedApiResponseData.error }
+    }
+    const parsedLocations = MatchedLocationSchema.array().safeParse(parsedApiResponseData.data)
+    if (!parsedLocations.success) {
+        return { success: false, error: parsedLocations.error }
+    }
+    return { success: true, data: parsedLocations.data }
 }
