@@ -21,3 +21,54 @@ export const LocationsResultSchema = LocationsApiSchema.transform((item: z.infer
 }))
 
 export type LocationsResult = z.infer<typeof LocationsResultSchema>
+
+export const WeatherDataSchema = z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+    currentWeatherData: z.object({
+        day: z.string(),
+        temperature: z.number(),
+        humidity: z.number(),
+        temperatureFeel: z.number(),
+        precipitation: z.number(),
+        iconCode: z.number(),
+        wind: z.number(),
+    }),
+    hourlyWeatherData: z.object({
+        hours: z.string().array(),
+        temperatures: z.number().array(),
+        iconCodes: z.number().array(),
+    }),
+    dailyWeatherData: z.object({
+        days: z.string().array(),
+        temperaturesMax: z.number().array(),
+        temperaturesMin: z.number().array(),
+        iconCodes: z.number().array(),
+    })
+})
+
+export type WeatherData = {
+    latitude: number,
+    longitude: number,
+    currentWeatherData: {
+        day: string,
+        temperature: number,
+        humidity: number,
+        temperatureFeel: number,
+        precipitation: number,
+        iconCode: number,
+        wind: number,
+    },
+    hourlyWeatherData: {
+        hours: string[],
+        temperatures: number[][],
+        iconCodes: number[][],
+    },
+    dailyWeatherData: {
+        days: string[],
+        temperaturesMax: number[],
+        temperaturesMin: number[],
+        iconCodes: number[],
+    }
+}
+

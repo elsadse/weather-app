@@ -6,9 +6,10 @@ import { fetchLocations } from "@/api/geocodingapi";
 export function SearchContainer() {
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [resultSSearch, setResultSSearch] = useState<LocationsResult[]>([])
+    const [selectedLocation, setSelectedLocation] = useState<{ longitude: number, latitude: number } | null>(null)
 
     useEffect(() => {
-        if (searchTerm.length < 2) setResultSSearch([])
+        if (searchTerm.length < 2) return
         fetchLocations(searchTerm).then(({ results, error }) => {
             if (error) {
                 console.error(error)
@@ -19,12 +20,20 @@ export function SearchContainer() {
     }, [searchTerm])
 
     const handleResultClick = useCallback((result: LocationsResult) => {
-        setSearchTerm(result.city+" "+result.region+", "+result.country)
+        setSearchTerm(result.city + " " + result.region + ", " + result.country)
         setResultSSearch([])
+        setSelectedLocation({ latitude: result.latitude, longitude: result.longitude })
     }, [])
 
+    function handleSubmit(event: React.FormEvent) {
+        event.preventDefault()
+        if (selectedLocation) {
+            console.log(selectedLocation)
+        }
+    }
+
     return (
-        <form className="md:w-164 flex flex-col md:flex-row gap-y-3 md:gap-x-4 md:mx-auto">
+        <form onSubmit={handleSubmit} className="md:w-164 flex flex-col md:flex-row gap-y-3 md:gap-x-4 md:mx-auto">
             <div
                 className="h-14 md:w-full flex flex-row gap-x-4 px-6 py-4 items-center justify-between bg-neutral-800 rounded-12 relative">
                 <img src={IconSearch} alt="Search Icon" className="w-5 h-5" />
@@ -39,7 +48,7 @@ export function SearchContainer() {
                 />
                 {resultSSearch.length !== 0 && searchTerm.length !== 0 && <SearchDropdown results={resultSSearch} onResultClick={handleResultClick} />}
             </div>
-            <button type="submit" className="h-14 px-6 py-4 rounded-12 bg-blue-500 text-preset-5">Search</button>
+            <button type="submit" className="h-14 px-6 py-4 rounded-12 bg-blue-500 text-preset-5 cursor-pointer">Search</button>
         </form>
     )
 }
