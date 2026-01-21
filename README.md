@@ -1,6 +1,6 @@
 
 # Application météo
-[![Netlify Status](https://api.netlify.com/api/v1/badges/bbb90ea1-05e9-423e-9170-1268825316ee/deploy-status)](https://app.netlify.com/projects/weather-elsadse/deploys)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/elsadse/weather-app/deployment.yaml)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/elsadse/weather-app)
 ![GitHub repo size](https://img.shields.io/github/repo-size/elsadse/weather-app)
 ![GitHub License](https://img.shields.io/github/license/elsadse/weather-app)
