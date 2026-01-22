@@ -1,4 +1,12 @@
 import type { Location } from "@/api/types"
+import iconWeatherDrizzle from "@/assets/images/icon-drizzle.webp"
+import iconWeatherFrog from "@/assets/images/icon-fog.webp"
+import iconWeatherOvercast from "@/assets/images/icon-overcast.webp"
+import iconWeatherRain from "@/assets/images/icon-rain.webp"
+import iconWeatherSnow from "@/assets/images/icon-snow.webp"
+import iconWeatherStorm from "@/assets/images/icon-storm.webp"
+import iconWeatherSunny from "@/assets/images/icon-sunny.webp"
+import iconWeatherPartlyCloudy from "@/assets/images/icon-partly-cloudy.webp"
 
 export async function getUserPosition(): Promise<Location> {
     return new Promise((resolve, reject) => {
@@ -33,14 +41,14 @@ export async function getUserPosition(): Promise<Location> {
 }
 
 export const icons = {
-    drizzle: "/src/assets/images/icon-drizzle.webp",
-    frog: "/src/assets/images/icon-frog.webp",
-    overcast: "/src/assets/images/icon-overcast.webp",
-    rain: "/src/assets/images/icon-rain.webp",
-    snow: "/src/assets/images/icon-snow.webp",
-    storm: "/src/assets/images/icon-storm.webp",
-    sunny: "/src/assets/images/icon-sunny.webp",
-    partly_cloudy: "/src/assets/images/icon-partly-cloudy.webp"
+    drizzle: iconWeatherDrizzle,
+    frog: iconWeatherFrog,
+    overcast: iconWeatherOvercast,
+    rain: iconWeatherRain,
+    snow: iconWeatherSnow,
+    storm: iconWeatherStorm,
+    sunny: iconWeatherSunny,
+    partly_cloudy: iconWeatherPartlyCloudy
 }
 
 export function getIcon(code: number): string {
