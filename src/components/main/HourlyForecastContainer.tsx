@@ -1,130 +1,134 @@
-import type { HourlyWeatherData } from "@/api/types"
+import { type JSX, useRef, useState } from "react"
 import DropdownIcon from "@/assets/images/icon-dropdown.svg"
+import { useCloseDropdown } from "@/hooks/useCloseDropdown"
+import { useGlobalStore } from "@/hooks/useGlobalStore"
+import { useShallow } from "zustand/react/shallow"
+import type { WeatherData } from "@/api/types"
+import type { Nullable } from "@/types"
 import { getIcon } from "@/utils"
-import { useEffect, useState } from "react"
+import LoadingIcon from "@/assets/images/icon-loading.svg"
 
-export function HourlyForecastContainer({ hourlyForecastData }: { hourlyForecastData: HourlyWeatherData }) {
+type WeatherDataHourlyForecast = WeatherData["infos"]["forecast"]["hourly"][number]
+const weekdayFormatter = new Intl.DateTimeFormat("en-US", { weekday: "long" })
+const hourFormatter = new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: true })
+
+export function HourlyForecastContainer(): JSX.Element {
+    const ref = useRef<HTMLDivElement>(null)
     const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
-    const [selectedDay, setSelectedDay] = useState<Date>(new Date)
-    const [currentHour, setCurrentHour] = useState<number>(new Date().getHours())
+    const { weatherData, isLoading } = useGlobalStore(
+        useShallow((store) => ({
+            weatherData: store.fetchedData,
+            isLoading: store.isLoading
+        }))
+    )
+    const [selectedDateOverride, setSelectedDateOverride] = useState<Nullable<Date>>(null)
+    const selectedDate = selectedDateOverride ?? weatherData?.infos.current.date ?? null
 
-    const generateAvailableDays = (): Date[] => {
-        const today = new Date()
-        const days: Date[] = []
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(today)
-            date.setDate(today.getDate() + i)
-            days.push(date)
-        }
-        return days
-    }
-    const filterHourlyDataForSelectedDay = () => {
-        if (!hourlyForecastData || hourlyForecastData.length === 0) return []
-        const selectedDate = selectedDay
-        const selectedDayNum = selectedDate.getDate()
-        const selectedMonth = selectedDate.getMonth()
-        const selectedYear = selectedDate.getFullYear()
-        const dayData = hourlyForecastData.filter(item => {
-            const itemDate = item.datetime
-            return itemDate.getDate() === selectedDayNum &&
-                itemDate.getMonth() === selectedMonth &&
-                itemDate.getFullYear() === selectedYear
-        })
-        const isToday = selectedDate.getDate() === new Date().getDate() &&
-            selectedDate.getMonth() === new Date().getMonth() &&
-            selectedDate.getFullYear() === new Date().getFullYear()
-        if (isToday) {
-            return dayData.filter(item => item.datetime.getHours() >= currentHour)
-        }
-        return dayData
-    }
-    const filteredData = filterHourlyDataForSelectedDay()
+    useCloseDropdown(ref, (): void => setIsDropdownOpen(false))
 
-    useEffect(() => {
-        setCurrentHour(new Date().getHours())
-    }, [])
+    if (isLoading) return <HourlyForecastContainerLoading />
+    if (weatherData === null || selectedDate === null) return <div></div>
 
-    useEffect(() => {
-        if (!isDropdownOpen) return
+    const forecasts: WeatherDataHourlyForecast[] = weatherData.infos.forecast.hourly
+    const uniqueDates = [
+        ...new Set(
+            forecasts.map(
+                (forecast: WeatherDataHourlyForecast): string => forecast.datetime.toISOString().slice(0, 10)
+            )
+        )
+    ].map((value: string): Date => new Date(value))
 
-        const timeoutId = setTimeout(() => {
-            setIsDropdownOpen(false)
-        }, 5000)
-
-        return () => clearTimeout(timeoutId)
-    }, [isDropdownOpen])
-
-    const handleDaySelect = (day: Date) => {
-        setSelectedDay(day)
+    function setSelectedDate(date: Date): void {
+        setSelectedDateOverride(date)
         setIsDropdownOpen(false)
     }
 
     return (
-        <div className="h-171.25 max-h-171.25 md:max-h-173.25 overflow-y-auto flex flex-col gap-4 px-4 py-5 md:p-6 rounded-20 bg-neutral-800">
-            <div className="flex flex-row justify-between items-center">
-                <span className="text-preset-5">Hourly forecast</span>
-                <div className="relative">
-                    <div onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="flex flex-row gap-x-3 px-4 py-2 rounded-8 bg-neutral-600 items-center cursor-pointer">
-                        <span className="font-dm-medium">{selectedDay.toLocaleDateString("en-US", { weekday: "long" })}</span>
-                        <img src={DropdownIcon} alt="Units icon"
-                            className={` w-3 h-4.5 transform ${isDropdownOpen ? '-rotate-180' : 'rotate-0'} transition-transform duration-300 ease-in-out`}
-                        />
-                    </div>
-                    {isDropdownOpen && <DaysDropdown selectedDay={selectedDay} days={generateAvailableDays()} onSelect={handleDaySelect} />}
+        <div
+            className="h-full xl:max-h-173.25 overflow-y-auto flex flex-col gap-y-4 px-4 md:px-6 py-5 md:py-6 rounded-20 bg-neutral-800">
+            <div className="relative" ref={ref}>
+                <div className="flex flex-row items-center justify-between">
+                    <p className="text-preset-5">Hourly Forecast</p>
+                    <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="flex flex-row gap-x-3 px-4 py-2 rounded-8 bg-neutral-600 cursor-pointer items-center border-focus-neutral"
+                    >
+                        <p className="text-preset-7 ">{weekdayFormatter.format(selectedDate)}</p>
+                        <img src={DropdownIcon} alt="Dropdown icon"
+                            className={`w-3 h-4.5 transform ${isDropdownOpen ? '-rotate-180' : 'rotate-0'} transition-transform duration-300 ease-in-out`} />
+                    </button>
                 </div>
+                {isDropdownOpen &&
+                    <DaysDropdown selectedDate={selectedDate} setSelectedDate={setSelectedDate}
+                        dates={uniqueDates.slice(1, 8)} />}
             </div>
-            {filteredData.length > 0 && (
-                filteredData.map((item, index) => {
+            {
+                forecasts
+                    .filter((forecast: WeatherDataHourlyForecast) => (
+                        forecast.datetime.getDate() === selectedDate.getDate()
+                        && forecast.datetime >= weatherData.infos.current.date
+                    ))
+                    .map((forecast: WeatherDataHourlyForecast, index: number) => {
+                        return <HourlyWeatherCard key={index} data={forecast} />
+                    })
+            }
+        </div>
+    )
+}
+
+function HourlyWeatherCard({ data }: { data: WeatherDataHourlyForecast }): JSX.Element {
+    const { datetime, weather_code, temperature } = data
+
+    return (
+        <div
+            className="h-15 flex flex-row gap-x-2 pl-3 pr-4 py-2.5 rounded-8 bg-neutral-700 border border-neutral-600 items-center justify-between">
+            <img src={getIcon(weather_code)} alt="Sunny Icon" className="w-10 h-10" />
+            <p className="w-full text-preset-5">{hourFormatter.format(datetime)}</p>
+            <p className="text-preset-7">{Math.floor(temperature)}°</p>
+        </div>
+    )
+}
+
+function DaysDropdown({ selectedDate, setSelectedDate, dates }: {
+    selectedDate: Date,
+    setSelectedDate: (Date: Date) => void,
+    dates: Date[]
+}): JSX.Element {
+    const selectedDay = weekdayFormatter.format(selectedDate)
+
+    return (
+        <div
+            className="w-53.5 flex flex-col gap-y-1 p-2 rounded-12 bg-neutral-800 border border-neutral-600 absolute right-0 top-12"
+        >
+            {
+                dates.map((date: Date, index: number) => {
+                    const day = weekdayFormatter.format(date)
+
                     return (
-                        <HourlyWeatherCard
-                            key={index}
-                            hour={item.datetime.toLocaleString("en-US", { hour: "numeric" })}
-                            temperature={Math.round(item.temperature)}
-                            code={item.codeIcon}
-                        />
+                        <div key={index} onClick={() => setSelectedDate(date)}
+                            className={`h-10 px-2 py-2.5 flex flex-row items-center justify-between ${day === selectedDay
+                                    ? "rounded-8 bg-neutral-700 cursor-pointer"
+                                    : "hover:rounded-8 hover:bg-neutral-700"
+                                }`}>
+                            <p>{day}</p>
+                        </div>
                     )
                 })
-            )}
+            }
         </div>
     )
 }
 
-type DaysDropdownProps = {
-    days: Date[],
-    selectedDay: Date,
-    onSelect: (day: Date) => void
-}
-
-function DaysDropdown({ days, selectedDay, onSelect }: DaysDropdownProps) {
+function HourlyForecastContainerLoading(): JSX.Element {
 
     return (
-        <div className="absolute right-0 top-12 flex flex-col w-53.5 p-2 rounded-12 bg-neutral-800 gap-2.5 border border-neutral-600">
-            {days.map((day, index) => {
-                const isSelected = day.getDate() === selectedDay.getDate() &&
-                    day.getMonth() === selectedDay.getMonth() &&
-                    day.getFullYear() === selectedDay.getFullYear()
-                return (
-                    <span key={index} onClick={() => onSelect(day)}
-                        className={` h-9.75 px-[8px] py-[10px] text-preset-7
-                        ${isSelected ? "bg-neutral-700 rounded-8" : "hover:bg-neutral-700 hover:rounded-8"}
-                        cursor-pointer 
-                    `}>
-                        {day.toLocaleDateString("en-US", { weekday: "long" })}
-                    </span>
-                )
-            })}
-        </div>
-    )
-}
-
-function HourlyWeatherCard({ hour, temperature, code }: { hour: string, temperature: number, code: number }) {
-
-    return (
-        <div className="h-15 flex flex-row gap-x-2 pl-3 pr-4 py-2.5 rounded-8 bg-neutral-700 border border-neutral-600 items-center justify-between">
-            <img src={getIcon(code)} className="w-10 h-10" alt="weather ixon" />
-            <span className="w-full text-preset-5">{hour}</span>
-            <span className="text-preset-7">{temperature + "°"}</span>
+        <div
+            className="h-full xl:max-h-173.25 flex flex-col gap-y-4 px-4 md:px-6 py-5 md:py-6 rounded-20 bg-neutral-800">
+            <div className="flex flex-row items-center justify-between">
+                <p className="text-preset-5">Hourly Forecast</p>
+            </div>
+            <div className="h-full flex justify-center items-center">
+                <img src={LoadingIcon} alt="Loading Icon" className="w-10 h-10 spin-slow" />
+            </div>
         </div>
     )
 }

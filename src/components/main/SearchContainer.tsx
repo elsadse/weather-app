@@ -1,91 +1,148 @@
-import IconSearch from "@/assets/images/icon-search.svg";
-import type { Location, MatchedLocation } from "@/api/types";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { fetchLocations } from "@/api/geocodingapi";
-import { LocationContext } from "@/context/LocationContext";
+import { type ChangeEvent, type JSX, useEffect, useState } from "react"
+import SearchIcon from "@/assets/images/icon-search.svg"
+import LoadingIcon from "@/assets/images/icon-loading.svg"
+import ErrorIcon from "@/assets/images/icon-error.svg"
+import type { GeoLocation } from "@/api/types"
+import { useGlobalStore } from "@/hooks/useGlobalStore"
+import { useFetch } from "@/hooks/useFetch"
+import { fetchMatchingLocation } from "@/api/geocodingapi"
+import { useShallow } from "zustand/react/shallow"
+import type { Coordinates, Nullable } from "@/types"
 
-export function SearchContainer() {
-    const [searchTerm, setSearchTerm] = useState<string>("")
-    const [resultSSearch, setResultSSearch] = useState<MatchedLocation[]>([])
-    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
-    const locationContext = useContext(LocationContext)
+export function SearchContainer(): JSX.Element {
+    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
+    const {
+        fetchedData: matchedLocations, setFetchedData: setMatchedLocations,
+        isLoading, error, setError,
+        fetchParameter: searchInput, setFetchParameter: setSearchInput
+    } = useFetch<string, GeoLocation[]>(fetchMatchingLocation)
+
+    const [searchLocation, setSearchLocation] = useState<Nullable<GeoLocation>>(null)
+
+    const { fetchWeatherDataFunction } = useGlobalStore(
+        useShallow((state) => ({
+            fetchWeatherDataFunction: state.fetchDataFunction,
+        }))
+    )
+    const [coordinates, setCoordinates] = useState<Nullable<Coordinates>>(null)
 
     useEffect(() => {
-        if (searchTerm.length < 2) return
+        if (coordinates === null) return
 
-        async function searchLocation() {
-            const response = await fetchLocations(searchTerm)
-            if (!response.success) {
-                console.error(response.error)
-                return
-            }
-            setResultSSearch(response.data)
+        const abortController = new AbortController()
+        const signal = abortController.signal
+
+        fetchWeatherDataFunction(coordinates, signal)
+
+        return () => {
+            abortController.abort()
         }
+    }, [fetchWeatherDataFunction, coordinates])
 
-        searchLocation()
-    }, [searchTerm])
+    function searchInputOnChange(event: ChangeEvent<HTMLInputElement>): void {
+        const value: string = event.target.value
+        setSearchInput(value)
+        setSearchLocation(null)
+        setError(null)
 
-    useEffect(() => {
-        console.log("DEBUG - Location context:", locationContext?.location);
-    }, [locationContext?.location]);
+        if (value.length < 2) {
+            setIsDropdownOpen(false)
+            setMatchedLocations([])
+        } else {
+            setIsDropdownOpen(true)
+        }
+    }
 
-    const handleResultClick = useCallback((result: MatchedLocation) => {
-        setSearchTerm(result.city + " " + result.region + ", " + result.country)
-        setResultSSearch([])
-        setSelectedLocation({ latitude: result.latitude, longitude: result.longitude })
-    }, [])
+    function updateSearchInput(location: GeoLocation): void {
+        setSearchInput(`${location.city}, ${location.region}, ${location.country}`)
+        setSearchLocation(location)
+        setIsDropdownOpen(false)
+        setError(null)
+    }
 
-    function handleSubmit(event: React.FormEvent) {
-        event.preventDefault()
-        if (selectedLocation) {
-            locationContext?.setLocation(selectedLocation)
-            console.log(selectedLocation)
+    function handleSearch(): void {
+        if (searchLocation) {
+            setCoordinates({ latitude: searchLocation.latitude, longitude: searchLocation.longitude })
+            setSearchInput(null)
+            setSearchLocation(null)
+            setError(null)
         }
     }
 
     return (
-        <form onSubmit={handleSubmit} className="md:w-164 flex flex-col md:flex-row gap-y-3 md:gap-x-4 md:mx-auto">
+        <div className="md:w-164 flex flex-col md:flex-row gap-y-3 md:gap-x-4 md:mx-auto">
             <div
-                className="h-14 md:w-full flex flex-row gap-x-4 px-6 py-4 items-center justify-between bg-neutral-800 rounded-12 relative">
-                <img src={IconSearch} alt="Search Icon" className="w-5 h-5" />
-                <input
-                    type="search"
-                    name="search"
-                    id="search"
+                className="h-14 md:w-full flex flex-row items-center bg-neutral-800 rounded-12 relative">
+                <img src={SearchIcon} alt="Search Icon" className="w-5 h-5 absolute left-6" />
+                <input type="search" name="searchInput" value={searchInput ?? ""}
+                    onChange={searchInputOnChange}
                     placeholder="Search for a place..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full focus:outline-none placeholder:text-preset-5 color-neutral-200"
-                />
-                {resultSSearch.length !== 0 && searchTerm.length !== 0 && <SearchDropdown results={resultSSearch} onResultClick={handleResultClick} />}
+                    className="w-full h-full pl-15 pr-5 placeholder:text-preset-5 text-preset-5 color-neutral-200 rounded-12 border-focus-neutral" />
+                {
+                    isDropdownOpen
+                    && <SearchDropdown locations={matchedLocations} updateSearchInput={updateSearchInput}
+                        isLoading={isLoading} error={error} />
+                }
             </div>
-            <button type="submit" className="h-14 px-6 py-4 rounded-12 bg-blue-500 text-preset-5 cursor-pointer">Search</button>
-        </form>
+            <button disabled={!searchLocation} className={`h-14 px-6 py-4 rounded-12 bg-blue-500 text-preset-5 ${!searchLocation ? "opacity-50" : "cursor-pointer border-focus-blue"
+                }`} onClick={handleSearch}>Search
+            </button>
+        </div>
     )
 }
 
-type SearchDropdownProps = {
-    results: MatchedLocation[],
-    onResultClick: (result: MatchedLocation) => void;
-}
+function SearchDropdown({ locations, updateSearchInput, isLoading, error }: {
+    locations: Nullable<GeoLocation[]>, updateSearchInput: (searchLocation: GeoLocation) => void, isLoading: boolean,
+    error: Nullable<Error>
+}): JSX.Element {
 
-function SearchDropdown({ results, onResultClick }: SearchDropdownProps) {
+    if (error) return <SearchDropdownError error={error} />
+    if (isLoading || locations === null) return <SearchDropdownLoading />
 
     return (
         <div
-            className="max-h-64 overflow-y-auto absolute left-0 top-16 w-85.75 md:w-147.5 xl:w-131.5 flex flex-col gap-x-1 p-2 bg-neutral-800 rounded-12">
+            className="w-full max-h-177 overflow-y-auto flex flex-col gap-y-1 p-2 rounded-12 bg-neutral-800 border border-neutral-700 absolute left-0 top-16 max-md:top-34"
+        >
             {
-                results.map((result, index) => (
-                    <div onClick={() => onResultClick(result)}
-                        key={index} className=" flex flex-col px-2 py-2.5 rounded-8 hover:bg-neutral-700 cursor-pointer">
-                        <span className="text-preset-6">{result.city}</span>
-                        <span className="text-preset-7 text-neutral-200">{result.region}, {result.country}</span>
-                    </div>
-                ))
+                locations.length === 0
+                    ? <div className="px-2 py-2.5 rounded-8">No results</div>
+                    : locations.map((location: GeoLocation): JSX.Element => (
+                        <div
+                            key={location.id}
+                            onClick={() => updateSearchInput(location)}
+                            className="flex flex-col gap-y-1 px-2 py-2.5 rounded-8 hover:bg-neutral-700 hover:border hover:border-neutral-600 hover:cursor-pointer">
+                            <p className="text-preset-6">{location.city}</p>
+                            <p className="text-preset-7 text-neutral-300">{location.region}, {location.country}</p>
+                        </div>
+                    ))
             }
         </div>
     )
 }
 
+function SearchDropdownLoading(): JSX.Element {
+    return (
+        <div
+            className="w-full max-h-177 overflow-y-auto flex flex-col gap-y-1 p-2 rounded-12 bg-neutral-800 border border-neutral-700 absolute left-0 top-16 max-md:top-34"
+        >
+            <div className="flex flex-row gap-x-2.5 px-2 py-2.5 justify-center items-center">
+                <img src={LoadingIcon} alt="Loading Icon" className="w-4 h-4 spin-slow" />
+                <p className="w-full text-preset-7">Search in progress...</p>
+            </div>
+        </div>
+    )
+}
 
+function SearchDropdownError({ error }: { error: Error }): JSX.Element {
 
+    return (
+        <div
+            className="w-full max-h-177 overflow-y-auto flex flex-col gap-y-1 p-2 rounded-12 bg-neutral-800 border border-neutral-700 absolute left-0 top-16 max-md:top-34"
+        >
+            <div className="flex flex-row gap-x-2.5 px-2 py-2.5 justify-center items-center">
+                <img src={ErrorIcon} alt="Error Icon" className="w-4 h-4" />
+                <p className="w-full text-preset-7">{error.message}</p>
+            </div>
+        </div>
+    )
+}
