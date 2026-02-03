@@ -8,11 +8,26 @@
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/elsadse/weather-app)
 ![GitHub Repo stars](https://img.shields.io/github/stars/elsadse/weather-app)
 
-Application météo responsive avec fonctionnalité de recherche, conversion d'unités et prévisions détaillées utilisant l'API Open-Meteo.
+Responsive weather app with search functionality, unit conversion, and detailed forecasts using the Open-Meteo API.
 
-## Configuration
+## Features
 
-- **Configuration de l'environnement de devéloppement:**
+- Search for weather information by entering a location in the search bar
+- View current weather conditions, including temperature, weather icon, and location details
+- See additional weather metrics like "feels like" temperature, humidity percentage, wind speed, and precipitation amounts
+- Browse a 7-day weather forecast with daily high/low temperatures and weather icons
+- View an hourly forecast showing temperature changes throughout the day
+- Switch between different days of the week using the day selector in the hourly forecast section
+- Toggle between Imperial and Metric measurement units via the units dropdown
+- Switch between specific temperature units (Celsius and Fahrenheit) and measurement units for wind speed (km/h and mph) and precipitation (millimeters) via the units dropdown
+- View the optimal layout for the interface depending on their device's screen size
+- See hover and focus states for all interactive elements on the page
+
+## Run the application locally
+
+The application is built and tested with **[Bun](https://bun.sh) (v1.3.6)**. While other runtimes may work, I recommended using Bun to install dependencies and run the project.
+
+- **By serving the original source code (unbundled):**
 
 ```bash
 git clone https://github.com/elsadse/weather-app.git
@@ -21,7 +36,7 @@ bun install
 bun run dev
 ```
 
-- **Production build et déploiement:**
+- **by serving the production version:**
 
 ```bash
 git clone https://github.com/elsadse/weather-app.git
@@ -31,27 +46,14 @@ bun run build
 bun run preview
 ```
 
-## Caractéristiques
+## Tech Stack
 
-- Recherchez des informations météorologiques en saisissant un lieu dans la barre de recherche
-- Consultez les conditions météorologiques actuelles, notamment la température, l'icône météo et les détails du lieu
-- Consultez des données météorologiques supplémentaires telles que la température ressentie, le taux d'humidité, la vitesse du vent et les précipitations
-- Consultez les prévisions météorologiques à 7 jours avec les températures maximales/minimales quotidiennes et les icônes météo
-- Consultez les prévisions horaires indiquant les changements de température tout au long de la journée
-- Passez d'un jour à l'autre à l'aide du sélecteur de jour dans la section des prévisions horaires
-- Passez des unités de mesure impériales aux unités métriques via le menu déroulant des unités
-- Passez d'une unité de température spécifique (Celsius et Fahrenheit) à une autre et d'une unité de mesure de la vitesse du vent (km/h et mph) à une autre et d'une unité de mesure des précipitations (millimètres) à une autre via le menu déroulant des unités
-- Affichez la disposition optimale de l'interface en fonction de la taille de l'écran de votre appareil
-- Affichez les états de survol et de mise au point pour tous les éléments interactifs de la page
-
-
-## Stack technologique
-
-- Typescript
-- React 19 + Vite
-- Tailwind CSS
-- Netlify
-
+- **Frontend Core:** [React](https://react.dev/) 19 with [TypeScript](https://www.typescriptlang.org/) for type-safe development.
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) 4.1 for a modern, utility-first UI design.
+- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) for global state management.
+- **Data Management:** [Zod](https://zod.dev/) for schema-driven API validation and the native Fetch API for network requests.
+- **Build Tooling:** [Vite](https://vitejs.dev/) for an optimized development environment and fast bundling.
+- **CI/CD & Infrastructure:** [GitHub Actions](https://github.com/features/actions) for automated Build & Deploy pipelines, hosted on [GitHub Pages](https://pages.github.com/).
 
 ## Auteurs
 
