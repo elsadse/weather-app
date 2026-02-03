@@ -2,7 +2,6 @@ import { create } from "zustand/react"
 import type { Coordinates, MeasureType, Nullable, Units, UnitSystem } from "@/types"
 import type { WeatherData } from "@/api/types"
 import { fetchWeatherData } from "@/api/weatherapi"
-import { devtools } from "zustand/middleware"
 import * as utils from "@/utils"
 import { convertWeatherData, getUnitsFor } from "@/utils"
 
@@ -18,8 +17,7 @@ type GlobalStore = {
     setError: (error: Nullable<Error>) => void
 }
 
-export const useGlobalStore = create<GlobalStore>()(
-    devtools<GlobalStore>((set, get) => ({
+export const useGlobalStore = create<GlobalStore>()((set, get) => ({
         unitSystem: "metric",
         switchUnitSystem: () => set((store) => {
             const unitSystem = store.unitSystem === "metric" ? "imperial" : "metric"
@@ -101,5 +99,5 @@ export const useGlobalStore = create<GlobalStore>()(
         fetchedData: null,
         error: null,
         setError: (error: Nullable<Error>) => set({ error }),
-    })),
+    }),
 )
