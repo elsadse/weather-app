@@ -57,4 +57,4 @@ bun run preview
 
 ## Auteurs
 
-- [@elsadse](https://www.github.com/elsadse)
+- [@elsadse](https://www.linkedin.com/in/elsadse/)
